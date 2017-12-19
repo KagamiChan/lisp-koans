@@ -49,11 +49,28 @@
 ;
 ; Your goal is to write the score method.
 
-(defun score (dice)
-  ; You need to write this method
-)
+(defun single-num (num)
+  (cond
+    ((= num 1) 100)
+    ((= num 5) 50)
+    (t 0)))
 
-(define-test test-score-of-an-empty-list-is-zero
+(defun score (dice)
+  (cond
+    ((not dice) 0)
+    (t (let ((count) (total 0))
+         (setf count (make-hash-table))
+         (loop for num in dice
+               do (setf (gethash num count) (1+ (or (gethash num count) 0)))
+               )
+         (loop for num being the hash-keys of count
+                 using (hash-value value)
+               do (if (>= value 3)
+                      (setf total (+ total (if (= num 1) 1000 (* 100 num)) (* (single-num num) (- value 3))))
+                      (setf total (+ total (* value (single-num num))))))
+         total))))
+
+(Define-test test-score-of-an-empty-list-is-zero
     (assert-equal 0 (score nil)))
 
 (define-test test-score-of-a-single-roll-of-5-is-50

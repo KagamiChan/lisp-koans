@@ -17,8 +17,32 @@
 
 (define-condition triangle-error  (error) ())
 
+(defun all-equal (&rest sides)
+  (apply #'= (car sides) (cdr sides))
+  )
+
+(defun some-equal (&rest sides)
+  (/=
+    (length (remove-duplicates sides :test #'=))
+    (length sides)
+    ))
+
+(defun triangle-invalid? (a b c)
+  (or
+   (notevery #'plusp (list a b c))
+   (<= (+ a b) c)
+   (<= (+ b c) a)
+   (<= (+ c a) b)
+   ))
+
 (defun triangle (a b c)
-  :write-me)
+  (if (triangle-invalid? a b c)
+      (error 'triangle-error)
+   (cond
+    ((all-equal a b c) :equilateral)
+    ((some-equal a b c) :isosceles)
+    ((/= a b c) :scalene)
+    (t :test))))
 
 
 (define-test test-equilateral-triangles-have-equal-sides
